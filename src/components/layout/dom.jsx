@@ -1,14 +1,28 @@
-import { DomStyle } from '@/components/layout/dom.style'
-import useStore from '@/helpers/store'
-import { useEffect, useRef } from 'react'
+import useStore from '@/helpers/store';
+import { useEffect, useRef } from 'react';
 
 const Dom = ({ children }) => {
-  const ref = useRef(null)
+  const ref = useRef(null);
   useEffect(() => {
-    useStore.setState({ dom: ref })
-  }, [])
+    useStore.setState({ dom: ref });
+  }, []);
 
-  return <DomStyle ref={ref}>{children}</DomStyle>
-}
+  return (
+    <div
+      ref={ref}
+      style={{
+        position: absolute,
+        top: '0px',
+        left: '0px',
+        zIndex: 10,
+        width: '100vw',
+        height: '100vh',
+        overflow: 'hidden',
+      }}
+    >
+      {children}
+    </div>
+  );
+};
 
-export default Dom
+export default Dom;

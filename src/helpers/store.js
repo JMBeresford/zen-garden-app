@@ -1,10 +1,10 @@
-import create from 'zustand'
+import create from 'zustand';
 
 const useStore = create(() => {
   return {
     router: null,
     dom: null,
-  }
-})
+  };
+});
 
-export default useStore
+export default useStore;
