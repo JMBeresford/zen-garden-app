@@ -11,7 +11,7 @@ const Dom = ({ children }) => {
     <div
       ref={ref}
       style={{
-        position: absolute,
+        position: 'absolute',
         top: '0px',
         left: '0px',
         zIndex: 10,
