@@ -1,10 +1,10 @@
-import Head from 'next/head'
+import Head from 'next/head';
 
-const titleDefault = 'React Three Next Starter'
-const url = 'https://react-three-next.vercel.app/'
+const titleDefault = 'Zen Garden App';
+const url = 'https://zen-garden-app.vercel.app/';
 const description =
-  'The easiest and fastest way to create a 3D website using React Three Fiber and NextJS'
-const author = 'Author'
+  'Zen Garden is a WIP idle game where a player can tend to their own personal zen garden.';
+const author = 'John Beresford';
 
 const Header = ({ title = titleDefault }) => {
   return (
@@ -79,7 +79,7 @@ const Header = ({ title = titleDefault }) => {
         <meta name='twitter:site' content='@onirenaud' />
       </Head>
     </>
-  )
-}
+  );
+};
 
-export default Header
+export default Header;
