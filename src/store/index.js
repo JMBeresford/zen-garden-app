@@ -1,9 +1,12 @@
 import create from 'zustand';
+import gardenSlice from './garden';
 
-const useStore = create(() => {
+const useStore = create((set, get) => {
   return {
     router: null,
     dom: null,
+
+    ...gardenSlice(set, get),
   };
 });
 

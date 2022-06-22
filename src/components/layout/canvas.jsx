@@ -1,6 +1,6 @@
 import { Canvas } from '@react-three/fiber';
 import { OrbitControls, Preload } from '@react-three/drei';
-import useStore from '@/helpers/store';
+import useStore from '@/store';
 import { useEffect, useRef } from 'react';
 
 const LControl = () => {
@@ -31,6 +31,7 @@ const LCanvas = ({ children }) => {
         position: 'absolute',
         top: 0,
       }}
+      camera={{ position: [0, 3, 5] }}
       onCreated={(state) => state.events.connect(dom.current)}
     >
       <LControl />
