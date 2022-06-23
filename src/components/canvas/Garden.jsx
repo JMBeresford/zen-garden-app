@@ -2,14 +2,28 @@ import useStore from '@/store';
 import { useMemo, useRef } from 'react';
 import Tile from './Tile';
 import shallow from 'zustand/shallow';
+import { useEffect } from 'react';
+import { Perf } from 'r3f-perf';
 
 const Garden = ({ ...props }) => {
   const ref = useRef();
 
-  const { tiles, gridSize } = useStore(
-    (state) => ({ tiles: state.tiles, gridSize: state.gridSize }),
+  useEffect(() => {
+    useStore.getState().actions.initGarden();
+  }, []);
+
+  const { tiles, gridSize, balance } = useStore(
+    (state) => ({
+      tiles: state.tiles,
+      gridSize: state.gridSize,
+      balance: state.balance,
+    }),
     shallow
   );
+
+  useEffect(() => {
+    console.log('Current Balance is: ', balance);
+  }, [balance]);
 
   // position each tile in the grid
   const garden = useMemo(() => {
@@ -24,20 +38,21 @@ const Garden = ({ ...props }) => {
   }, [gridSize, tiles]);
 
   return (
-    <group
-      ref={ref}
-      {...props}
-      onPointerMissed={() => useStore.setState({ clickedTile: null })}
-    >
-      {garden.map((tile, index) => (
-        <Tile
-          key={index}
-          index={index}
-          tileType={tile.type}
-          position={tile.position}
-        />
-      ))}
-    </group>
+    <>
+      <group ref={ref} {...props}>
+        {garden.map((tile, index) => (
+          <Tile
+            key={index}
+            index={index}
+            type={tile.type}
+            position={tile.position}
+            level={tile.level}
+            tendable={tile.tendable}
+          />
+        ))}
+      </group>
+      {window.location.hash.includes('debug') && <Perf />}
+    </>
   );
 };
 

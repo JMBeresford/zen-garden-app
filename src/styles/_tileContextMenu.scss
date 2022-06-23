@@ -1,3 +1,5 @@
+@use 'sass:color';
+
 $textColor: aliceblue;
 
 #tileContextMenu {
@@ -8,6 +10,7 @@ $textColor: aliceblue;
   display: flex;
   flex-direction: column;
   transform: scale(1);
+  transform-origin: center;
   color: $textColor;
 
   transition: transform 0.2s ease-in-out;
@@ -17,12 +20,23 @@ $textColor: aliceblue;
     border: none;
 
     padding: 0.2rem 0.35rem;
+    color: $textColor;
+
+    transition: color 0.2s ease-in-out;
+
+    &:hover {
+      color: tan;
+    }
+
+    &[disabled] {
+      color: #454545;
+    }
   }
 
   hr {
     width: 85%;
 
-    border: solid 1px $textColor;
+    border: solid 1px #454545;
   }
 
   &:not(.open) {

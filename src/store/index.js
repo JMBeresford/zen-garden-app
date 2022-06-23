@@ -1,5 +1,6 @@
 import create from 'zustand';
-import gardenSlice from './garden';
+import { gardenSlice, gardenActions } from './garden';
+import { bankSlice, bankActions } from './bank';
 
 const useStore = create((set, get) => {
   return {
@@ -7,6 +8,12 @@ const useStore = create((set, get) => {
     dom: null,
 
     ...gardenSlice(set, get),
+    ...bankSlice(set, get),
+
+    actions: {
+      ...gardenActions(set, get),
+      ...bankActions(set, get),
+    },
   };
 });
 

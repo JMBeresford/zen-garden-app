@@ -11,6 +11,8 @@ const TileContextMenu = () => {
     shallow
   );
 
+  const actions = useStore((state) => state.actions);
+
   const positionStyles = useMemo(() => {
     let styles = {};
 
@@ -29,16 +31,53 @@ const TileContextMenu = () => {
     return styles;
   }, [clickedPosition]);
 
+  const handleLevel = (e) => {
+    e.stopPropagation();
+
+    actions.levelTile(clickedTile);
+    useStore.setState({ clickedTile: null });
+  };
+
+  const handleUpgrade = (e) => {
+    e.stopPropagation();
+
+    actions.upgradeTile(clickedTile, 'pond');
+    useStore.setState({ clickedTile: null });
+  };
+
+  const handleTend = (e) => {
+    e.stopPropagation();
+
+    actions.tendTile(clickedTile);
+    useStore.setState({ clickedTile: null });
+  };
+
   return (
     <div
       id='tileContextMenu'
       className={clickedTile !== null ? 'open' : ''}
       style={{ ...positionStyles }}
     >
-      <button>Tend</button>
-      <button>Upgrade</button>
+      <button
+        onClick={(e) => handleTend(e)}
+        disabled={clickedTile && !clickedTile.userData.tendable}
+      >
+        Tend
+      </button>
+      {clickedTile && clickedTile.userData.type === 'sand' ? (
+        <button onClick={handleUpgrade}>Upgrade</button>
+      ) : (
+        <button
+          onClick={handleLevel}
+          disabled={clickedTile && clickedTile.userData.level >= 3}
+        >
+          Level
+        </button>
+      )}
       <hr />
-      <button>Cancel</button>
+      <button onClick={() => useStore.setState({ clickedTile: null })}>
+        Cancel
+      </button>
     </div>
   );
 };
