@@ -1,4 +1,6 @@
 @use 'tileContextMenu';
+@use 'header';
+@use 'modals';
 
 /*
 1. Prevent padding and border from affecting element width. (https://github.com/mozdevs/cssremedy/issues/4)
@@ -8,6 +10,8 @@
 ::before,
 ::after {
   box-sizing: border-box; /* 1 */
+  margin: 0;
+  padding: 0;
 }
 
 /*

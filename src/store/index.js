@@ -1,6 +1,7 @@
 import create from 'zustand';
 import { gardenSlice, gardenActions } from './garden';
 import { bankSlice, bankActions } from './bank';
+import { contextMenuSlice, contextMenuActions } from './contextMenu';
 
 const useStore = create((set, get) => {
   return {
@@ -9,10 +10,12 @@ const useStore = create((set, get) => {
 
     ...gardenSlice(set, get),
     ...bankSlice(set, get),
+    ...contextMenuSlice(set, get),
 
     actions: {
       ...gardenActions(set, get),
       ...bankActions(set, get),
+      ...contextMenuActions(set, get),
     },
   };
 });

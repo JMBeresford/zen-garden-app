@@ -3,13 +3,7 @@ import React, { useMemo } from 'react';
 import shallow from 'zustand/shallow';
 
 const TileContextMenu = () => {
-  const { clickedTile, clickedPosition } = useStore(
-    (state) => ({
-      clickedTile: state.clickedTile,
-      clickedPosition: state.clickedPosition,
-    }),
-    shallow
-  );
+  const { clickedTile, clickedPosition, hideContextMenu } = useStore();
 
   const actions = useStore((state) => state.actions);
 
@@ -31,20 +25,6 @@ const TileContextMenu = () => {
     return styles;
   }, [clickedPosition]);
 
-  const handleLevel = (e) => {
-    e.stopPropagation();
-
-    actions.levelTile(clickedTile);
-    useStore.setState({ clickedTile: null });
-  };
-
-  const handleUpgrade = (e) => {
-    e.stopPropagation();
-
-    actions.upgradeTile(clickedTile, 'pond');
-    useStore.setState({ clickedTile: null });
-  };
-
   const handleTend = (e) => {
     e.stopPropagation();
 
@@ -55,7 +35,7 @@ const TileContextMenu = () => {
   return (
     <div
       id='tileContextMenu'
-      className={clickedTile !== null ? 'open' : ''}
+      className={clickedTile !== null && !hideContextMenu ? 'open' : ''}
       style={{ ...positionStyles }}
     >
       <button
@@ -65,10 +45,18 @@ const TileContextMenu = () => {
         Tend
       </button>
       {clickedTile && clickedTile.userData.type === 'sand' ? (
-        <button onClick={handleUpgrade}>Upgrade</button>
+        <button
+          onClick={() =>
+            useStore.setState({ upgradingSand: true, hideContextMenu: true })
+          }
+        >
+          Upgrade
+        </button>
       ) : (
         <button
-          onClick={handleLevel}
+          onClick={() =>
+            useStore.setState({ levelingUp: true, hideContextMenu: true })
+          }
           disabled={clickedTile && clickedTile.userData.level >= 3}
         >
           Level

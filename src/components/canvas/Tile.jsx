@@ -1,7 +1,7 @@
 import useStore from '@/store';
 import { Box } from '@react-three/drei';
 import { useFrame, useThree } from '@react-three/fiber';
-import React, { useMemo, useRef, useState } from 'react';
+import React, { useCallback, useMemo, useRef, useState } from 'react';
 import { damp } from 'three/src/math/MathUtils';
 
 const Tile = ({ type = 'sand', index, level = 0, tendable, ...props }) => {
@@ -22,14 +22,21 @@ const Tile = ({ type = 'sand', index, level = 0, tendable, ...props }) => {
     }
   }, [type]);
 
-  const handleClick = (e, tile) => {
-    if (clickedTile === null) {
-      let x = e.x / window.innerWidth;
-      let y = e.y / window.innerHeight;
+  const handleClick = useCallback(
+    (e, tile) => {
+      if (clickedTile === null) {
+        let x = e.x / window.innerWidth;
+        let y = e.y / window.innerHeight;
 
-      useStore.setState({ clickedPosition: { x, y }, clickedTile: tile });
-    }
-  };
+        useStore.setState({
+          clickedPosition: { x, y },
+          clickedTile: tile,
+          hideContextMenu: false,
+        });
+      }
+    },
+    [clickedTile]
+  );
 
   useFrame(({ clock }, delta) => {
     if (tendable) {

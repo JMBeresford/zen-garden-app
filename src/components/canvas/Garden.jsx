@@ -12,18 +12,13 @@ const Garden = ({ ...props }) => {
     useStore.getState().actions.initGarden();
   }, []);
 
-  const { tiles, gridSize, balance } = useStore(
+  const { tiles, gridSize } = useStore(
     (state) => ({
       tiles: state.tiles,
       gridSize: state.gridSize,
-      balance: state.balance,
     }),
     shallow
   );
-
-  useEffect(() => {
-    console.log('Current Balance is: ', balance);
-  }, [balance]);
 
   // position each tile in the grid
   const garden = useMemo(() => {

@@ -1,0 +1,20 @@
+#header {
+  position: fixed;
+
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+
+  width: min(90%, 1500px);
+  min-height: 7.5vh;
+
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
+  button {
+    border: solid 1px black;
+
+    padding: 0.2rem 0.5rem;
+  }
+}

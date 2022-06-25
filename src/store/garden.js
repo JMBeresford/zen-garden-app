@@ -2,17 +2,7 @@ import { addEffect } from '@react-three/fiber';
 
 const gardenSlice = (set, get) => ({
   gridSize: 3,
-  tiles: [
-    { type: 'sand', level: 0, tendable: false, tendableAt: 0 },
-    { type: 'sand', level: 0, tendable: false, tendableAt: 0 },
-    { type: 'sand', level: 0, tendable: true, tendableAt: 0 },
-    { type: 'sand', level: 0, tendable: false, tendableAt: 0 },
-    { type: 'stone', level: 1, tendable: false, tendableAt: 0 },
-    { type: 'sand', level: 0, tendable: false, tendableAt: 0 },
-    { type: 'sand', level: 0, tendable: false, tendableAt: 0 },
-    { type: 'sand', level: 0, tendable: false, tendableAt: 0 },
-    { type: 'sand', level: 0, tendable: true, tendableAt: 0 },
-  ],
+  tiles: [],
 
   clickedTile: null,
   clickedPosition: { x: 0, y: 0 },
@@ -22,6 +12,26 @@ const gardenActions = (set, get) => ({
   initGarden: (garden = null) => {
     if (garden) {
       set({ tiles: garden });
+    } else {
+      let area = get().gridSize * get().gridSize;
+      let g = [];
+
+      for (let i = 0; i < area; i++) {
+        g.push(get().actions.generateTile('sand'));
+
+        // make center tile a stone
+        if (i === Math.floor(area / 2.0)) {
+          g[i].type = 'stone';
+          g[i].level = 1;
+        }
+
+        if (Math.random() < 0.15) {
+          // give some tendability to the initial gardens
+          g[i].tendable = true;
+        }
+      }
+
+      set({ tiles: g });
     }
 
     const calcTendTime = get().actions.calculateNextTendableTime;
@@ -63,6 +73,15 @@ const gardenActions = (set, get) => ({
       }
     });
   },
+  generateTile: (tileType) => {
+    let calcTendAt = get().actions.calculateNextTendableTime;
+    return {
+      type: tileType,
+      level: 0,
+      tendable: false,
+      tendableAt: calcTendAt(tileType, performance.now() / 1000),
+    };
+  },
   calculateNextTendableTime: (type, curTime) => {
     switch (type) {
       case 'sand': {
@@ -78,12 +97,12 @@ const gardenActions = (set, get) => ({
       }
     }
   },
-  calculateTendYields: (tile) => {
+  calculateTendYields: (tile, levelOffset = 0) => {
     if (tile.userData.type === 'sand') return 1;
 
     let yields = tile.userData.type === 'stone' ? 5 : 3;
 
-    for (let i = 0; i < tile.userData.level; i++) {
+    for (let i = 0; i < tile.userData.level + levelOffset; i++) {
       yields = Math.pow(yields, 1.25);
     }
 
@@ -99,6 +118,11 @@ const gardenActions = (set, get) => ({
     let baseCost = type === 'stone' ? 10 : 7;
 
     return Math.pow(baseCost, level + 1);
+  },
+  calculateExpansionCost: () => {
+    let newSize = get().gridSize + 1;
+
+    return Math.floor(10 * newSize * Math.log10(newSize));
   },
   tendTile: (tile) => {
     if (!tile.userData.tendable) {
@@ -203,6 +227,53 @@ const gardenActions = (set, get) => ({
     });
 
     set({ tiles: newTiles });
+  },
+  expandGarden: () => {
+    let cost = get().actions.calculateExpansionCost();
+
+    if (get().balance < cost) {
+      console.error('Not enough money to expand garden');
+      return;
+    } else {
+      set({ balance: get().balance - cost });
+    }
+
+    let size = get().gridSize;
+    let newSize = get().gridSize + 2;
+    let generateTile = get().actions.generateTile;
+    let curTiles = get().tiles;
+
+    // get top row of expanded grid
+    let topRow = [];
+
+    for (let i = 0; i < newSize; i++) {
+      topRow.push(generateTile('sand'));
+    }
+
+    // get bottom row of expanded grid
+    let bottomRow = [];
+
+    for (let i = 0; i < newSize; i++) {
+      bottomRow.push(generateTile('sand'));
+    }
+
+    let innerRows = [];
+
+    // add tiles to left and right of existing rows
+    curTiles.forEach((tile, index) => {
+      if (index % size === 0) {
+        innerRows.push(generateTile('sand'));
+        innerRows.push(tile);
+      } else if (index % size === size - 1) {
+        innerRows.push(tile);
+        innerRows.push(generateTile('sand'));
+      } else {
+        innerRows.push(tile);
+      }
+    });
+
+    // set new garden
+    set({ tiles: [...topRow, ...innerRows, ...bottomRow], gridSize: newSize });
   },
 });
 

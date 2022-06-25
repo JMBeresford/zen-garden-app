@@ -1,5 +1,5 @@
 const bankSlice = (set, get) => ({
-  balance: 10,
+  balance: 200,
 });
 
 const bankActions = (set, get) => ({
