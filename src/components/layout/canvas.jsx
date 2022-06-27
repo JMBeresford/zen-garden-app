@@ -2,6 +2,7 @@ import { Canvas } from '@react-three/fiber';
 import { OrbitControls, Preload } from '@react-three/drei';
 import useStore from '@/store';
 import { useEffect, useRef } from 'react';
+import { ACESFilmicToneMapping } from 'three';
 
 const LControl = () => {
   const dom = useStore((state) => state.dom);
@@ -19,7 +20,7 @@ const LControl = () => {
     }
   }, [dom, control]);
   // @ts-ignore
-  return <OrbitControls ref={control} domElement={dom.current} />;
+  return <OrbitControls ref={control} />;
 };
 const LCanvas = ({ children }) => {
   const dom = useStore((state) => state.dom);
@@ -31,10 +32,11 @@ const LCanvas = ({ children }) => {
         position: 'absolute',
         top: 0,
       }}
+      gl={{ toneMapping: ACESFilmicToneMapping }}
       camera={{ position: [0, 3, 5] }}
-      onCreated={(state) => state.events.connect(dom.current)}
+      // onCreated={(state) => state.events.connect(dom.current)}
     >
-      <LControl />
+      {/* <LControl /> */}
       <Preload all />
       {children}
     </Canvas>

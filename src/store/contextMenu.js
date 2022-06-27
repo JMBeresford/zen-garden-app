@@ -1,11 +1,7 @@
 const contextMenuSlice = (set, get) => ({
-  hideContextMenu: false,
+  showContextMenu: false,
   upgradingSand: false,
   levelingUp: false,
-
-  levelingTree: false,
-  levelingStone: false,
-  levelingPond: false,
 });
 
 const contextMenuActions = (set, get) => ({

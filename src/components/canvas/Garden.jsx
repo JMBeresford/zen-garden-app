@@ -1,9 +1,9 @@
 import useStore from '@/store';
 import { useMemo, useRef } from 'react';
 import Tile from './Tile';
-import shallow from 'zustand/shallow';
 import { useEffect } from 'react';
 import { Perf } from 'r3f-perf';
+import { OrbitControls } from '@react-three/drei';
 
 const Garden = ({ ...props }) => {
   const ref = useRef();
@@ -12,13 +12,7 @@ const Garden = ({ ...props }) => {
     useStore.getState().actions.initGarden();
   }, []);
 
-  const { tiles, gridSize } = useStore(
-    (state) => ({
-      tiles: state.tiles,
-      gridSize: state.gridSize,
-    }),
-    shallow
-  );
+  const { tiles, gridSize, debug } = useStore();
 
   // position each tile in the grid
   const garden = useMemo(() => {
@@ -46,7 +40,9 @@ const Garden = ({ ...props }) => {
           />
         ))}
       </group>
-      {window.location.hash.includes('debug') && <Perf />}
+
+      <OrbitControls />
+      {debug && <Perf position='bottom-left' />}
     </>
   );
 };

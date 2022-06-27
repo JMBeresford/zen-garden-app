@@ -2,6 +2,8 @@ import dynamic from 'next/dynamic';
 import TileContextMenu from '@/components/dom/TileContextMenu';
 import Header from '@/components/dom/Header';
 import TileUpgrades from '@/components/dom/TileUpgrades';
+import { Leva } from 'leva';
+import useStore from '@/store';
 
 // Dynamic import is used to prevent a payload when the website start that will include threejs r3f etc..
 // WARNING ! errors might get obfuscated by using dynamic import.
@@ -13,11 +15,13 @@ const Garden = dynamic(() => import('@/components/canvas/Garden'), {
 
 // dom components goes here
 const Page = (props) => {
+  const { debug } = useStore();
   return (
     <>
       <Header />
       <TileContextMenu />
       <TileUpgrades />
+      <Leva hidden={!debug} />
     </>
   );
 };

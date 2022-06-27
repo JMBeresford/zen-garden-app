@@ -1,41 +1,63 @@
 import useStore from '@/store';
-import { Box } from '@react-three/drei';
-import { useFrame, useThree } from '@react-three/fiber';
-import React, { useCallback, useMemo, useRef, useState } from 'react';
+import { Box, shaderMaterial } from '@react-three/drei';
+import { extend, useFrame } from '@react-three/fiber';
+import { useControls } from 'leva';
+import React, { useCallback, useMemo, useRef } from 'react';
+import { Color } from 'three';
 import { damp } from 'three/src/math/MathUtils';
+import { vertexShader, fragmentShader } from './shaders';
+
+const SandMaterial = shaderMaterial(
+  { uColor: new Color() },
+  vertexShader,
+  fragmentShader,
+  (mat) => {
+    mat.toneMapped = true;
+    // mat.transparent = true;
+  }
+);
+
+extend({ SandMaterial });
 
 const Tile = ({ type = 'sand', index, level = 0, tendable, ...props }) => {
   const ref = useRef();
 
-  const clickedTile = useStore((state) => state.clickedTile);
+  const { clickedTile, showContextMenu } = useStore();
+
+  const { sandColor, stoneColor, pondColor, treeColor } = useControls({
+    sandColor: '#ffe3af',
+    stoneColor: '#b1b1b1',
+    pondColor: '#00bfff',
+    treeColor: '#4fcb72',
+  });
 
   const tileColor = useMemo(() => {
     switch (type) {
       case 'sand':
-        return 'tan';
+        return sandColor;
       case 'stone':
-        return 'grey';
+        return stoneColor;
       case 'tree':
-        return 'green';
+        return treeColor;
       case 'pond':
-        return 'blue';
+        return pondColor;
     }
-  }, [type]);
+  }, [type, sandColor, stoneColor, pondColor, treeColor]);
 
   const handleClick = useCallback(
     (e, tile) => {
-      if (clickedTile === null) {
+      if (!showContextMenu) {
         let x = e.x / window.innerWidth;
         let y = e.y / window.innerHeight;
 
         useStore.setState({
           clickedPosition: { x, y },
           clickedTile: tile,
-          hideContextMenu: false,
+          showContextMenu: true,
         });
       }
     },
-    [clickedTile]
+    [clickedTile, showContextMenu]
   );
 
   useFrame(({ clock }, delta) => {
@@ -65,7 +87,8 @@ const Tile = ({ type = 'sand', index, level = 0, tendable, ...props }) => {
       }}
     >
       <planeGeometry args={[1, 1]} />
-      <meshBasicMaterial color={tileColor} />
+      {/* <meshBasicMaterial color={tileColor} /> */}
+      <sandMaterial uColor={tileColor} />
 
       {/* TEMPORARY FOR DEBUGGING LEVELS */}
       <group rotation-x={Math.PI / 2}>

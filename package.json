@@ -10,7 +10,7 @@
     "node": ">=14"
   },
   "scripts": {
-    "lint": "yarn prettier && yarn eslint",
+    "lint": "npm run prettier && npm run eslint",
     "eslint": "next lint --fix --dir src",
     "prettier": "prettier -l \"./src/**/*.{js,jsx,md}\"",
     "dev": "next dev",
@@ -25,7 +25,9 @@
     "@react-three/drei": "^9.11.2",
     "@react-three/fiber": "^8.0.19",
     "babel-plugin-glsl": "^1.0.0",
+    "glsl-noise": "^0.0.0",
     "glsl-random": "^0.0.5",
+    "leva": "^0.9.27",
     "next": "^12.1.6",
     "r3f-perf": "^6.4.1",
     "react": "^18.1.0",

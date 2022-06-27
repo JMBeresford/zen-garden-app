@@ -22,14 +22,11 @@ const LevelUp = () => {
     shallow
   );
 
-  const typeRef = useRef();
-  const levelRef = useRef();
-
   const level = useMemo(() => {
     if (clickedTile) {
       return clickedTile.userData.level;
     } else {
-      return levelRef.current;
+      return '';
     }
   }, [clickedTile]);
 
@@ -37,9 +34,17 @@ const LevelUp = () => {
     if (clickedTile) {
       return clickedTile.userData.type;
     } else {
-      return typeRef.current;
+      return 'Tile';
     }
   }, [clickedTile]);
+
+  const cost = useMemo(() => {
+    if (clickedTile && clickedTile.userData.type !== 'sand') {
+      return calculateLevelCost(clickedTile);
+    } else {
+      return 0;
+    }
+  }, [clickedTile, calculateLevelCost]);
 
   const yields = useMemo(() => {
     let y = { now: 0, next: 0 };
@@ -47,28 +52,21 @@ const LevelUp = () => {
     if (clickedTile) {
       y.now = calculateTendYields(clickedTile);
 
-      y.next = calculateTendYields(clickedTile, clickedTile.userData.level + 1);
+      y.next = calculateTendYields(clickedTile, 1);
     }
 
     return y;
   }, [clickedTile, calculateTendYields]);
-
-  useEffect(() => {
-    if (clickedTile) {
-      typeRef.current = clickedTile.userData.type;
-      levelRef.current = clickedTile.userData.level;
-    }
-  }, [clickedTile]);
 
   return (
     <div
       id='levelUpModal'
       className={levelingUp ? 'modal open' : 'modal'}
       onClick={() => {
-        useStore.setState({ levelingUp: false, clickedTile: null });
+        useStore.setState({ levelingUp: false });
       }}
     >
-      <div className='bounds'>
+      <div className='bounds' onClick={(e) => e.stopPropagation()}>
         <div className='head'>
           <h1>
             {type} level: {level} → {level + 1}
@@ -78,9 +76,7 @@ const LevelUp = () => {
         <p>
           Yields: {yields.now} → {yields.next}
         </p>
-        <p className='cost'>
-          Costs: {clickedTile && calculateLevelCost(clickedTile)}
-        </p>
+        <p className='cost'>Costs: {cost}</p>
         <button onClick={() => levelTile(clickedTile)}>Level Up</button>
       </div>
     </div>

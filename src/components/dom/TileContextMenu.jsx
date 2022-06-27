@@ -3,7 +3,7 @@ import React, { useMemo } from 'react';
 import shallow from 'zustand/shallow';
 
 const TileContextMenu = () => {
-  const { clickedTile, clickedPosition, hideContextMenu } = useStore();
+  const { clickedTile, clickedPosition, showContextMenu } = useStore();
 
   const actions = useStore((state) => state.actions);
 
@@ -29,13 +29,13 @@ const TileContextMenu = () => {
     e.stopPropagation();
 
     actions.tendTile(clickedTile);
-    useStore.setState({ clickedTile: null });
+    useStore.setState({ showContextMenu: false });
   };
 
   return (
     <div
       id='tileContextMenu'
-      className={clickedTile !== null && !hideContextMenu ? 'open' : ''}
+      className={showContextMenu ? 'open' : ''}
       style={{ ...positionStyles }}
     >
       <button
@@ -47,7 +47,7 @@ const TileContextMenu = () => {
       {clickedTile && clickedTile.userData.type === 'sand' ? (
         <button
           onClick={() =>
-            useStore.setState({ upgradingSand: true, hideContextMenu: true })
+            useStore.setState({ upgradingSand: true, showContextMenu: false })
           }
         >
           Upgrade
@@ -55,7 +55,7 @@ const TileContextMenu = () => {
       ) : (
         <button
           onClick={() =>
-            useStore.setState({ levelingUp: true, hideContextMenu: true })
+            useStore.setState({ levelingUp: true, showContextMenu: false })
           }
           disabled={clickedTile && clickedTile.userData.level >= 3}
         >
@@ -63,7 +63,7 @@ const TileContextMenu = () => {
         </button>
       )}
       <hr />
-      <button onClick={() => useStore.setState({ clickedTile: null })}>
+      <button onClick={() => useStore.setState({ showContextMenu: false })}>
         Cancel
       </button>
     </div>
