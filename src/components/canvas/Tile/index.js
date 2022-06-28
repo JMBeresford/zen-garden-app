@@ -36,6 +36,7 @@ const Tile = ({ type = 'sand', index, level = 0, tendable, ...props }) => {
   const ref = useRef();
 
   const { clickedTile, showContextMenu } = useStore();
+  const tendTile = useStore((state) => state.actions.tendTile);
 
   const [normalTexture, displacementTexture] = useTexture([
     normalImage.src,
@@ -70,16 +71,10 @@ const Tile = ({ type = 'sand', index, level = 0, tendable, ...props }) => {
   );
 
   useFrame(({ clock }, delta) => {
-    // if (tendable) {
-    //   ref.current.position.y = damp(
-    //     ref.current.position.y,
-    //     Math.sin(clock.elapsedTime + 50 * index) * 0.1,
-    //     0.8,
-    //     delta
-    //   );
-    // } else {
-    //   ref.current.position.y = damp(ref.current.position.y, 0, 1.5, delta);
-    // }
+    if (tendable && type === 'sand') {
+      // DO SOME ANIMATION
+      tendTile(ref.current);
+    }
   });
 
   return (
