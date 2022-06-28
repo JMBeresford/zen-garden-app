@@ -4,10 +4,10 @@ import { extend, useFrame } from '@react-three/fiber';
 import { useControls } from 'leva';
 import React, { useCallback, useMemo, useRef } from 'react';
 import { Color, Texture } from 'three';
-import { damp } from 'three/src/math/MathUtils';
 import { vertexShader, fragmentShader } from './shaders';
 import normalImage from './img/sandNormal.png';
 import displacementImage from './img/sandDisplacement.png';
+import roughnessImage from './img/sandRoughness.png';
 import Stone from './Stone';
 import Pond from './Pond';
 import Tree from './Tree';
@@ -16,8 +16,10 @@ const SandMaterial = shaderMaterial(
   {
     uColor: new Color(),
     uSunColor: new Color(),
+    uSunPos: [0, 0, 0],
     uNormalMap: new Texture(),
     uDisplacementMap: new Texture(),
+    uRoughnessMap: new Texture(),
     uAmbientFactor: 0.5,
     uDiffuseFactor: 0.5,
     uDisplacement: 0.1,
@@ -38,9 +40,10 @@ const Tile = ({ type = 'sand', index, level = 0, tendable, ...props }) => {
   const { clickedTile, showContextMenu } = useStore();
   const tendTile = useStore((state) => state.actions.tendTile);
 
-  const [normalTexture, displacementTexture] = useTexture([
+  const [normalTexture, displacementTexture, roughnessTexture] = useTexture([
     normalImage.src,
     displacementImage.src,
+    roughnessImage.src,
   ]);
 
   const { sandColor, displacement } = useControls('Sand', {
@@ -48,11 +51,15 @@ const Tile = ({ type = 'sand', index, level = 0, tendable, ...props }) => {
     displacement: { value: 0.1, min: 0, max: 1, step: 0.05 },
   });
 
-  const { sunColor, ambientFactor, diffuseFactor } = useControls('Lighting', {
-    sunColor: 'white',
-    ambientFactor: { value: 0.5, min: 0, max: 1, step: 0.05 },
-    diffuseFactor: { value: 0.5, min: 0, max: 1, step: 0.05 },
-  });
+  const { sunColor, sunPos, ambientFactor, diffuseFactor } = useControls(
+    'Lighting',
+    {
+      sunColor: 'white',
+      sunPos: [0, 10, -2],
+      ambientFactor: { value: 0.5, min: 0, max: 1, step: 0.05 },
+      diffuseFactor: { value: 0.5, min: 0, max: 1, step: 0.05 },
+    }
+  );
 
   const handleClick = useCallback(
     (e, tile) => {
@@ -95,10 +102,12 @@ const Tile = ({ type = 'sand', index, level = 0, tendable, ...props }) => {
         uColor={sandColor}
         uNormalMap={normalTexture}
         uDisplacementMap={displacementTexture}
+        uRoughnessMap={roughnessTexture}
         uAmbientFactor={ambientFactor}
         uDiffuseFactor={diffuseFactor}
         uSunColor={sunColor}
         uDisplacement={displacement}
+        uSunPos={sunPos}
       />
 
       {type === 'stone' && (
