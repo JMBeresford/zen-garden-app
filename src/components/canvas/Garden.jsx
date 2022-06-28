@@ -4,6 +4,7 @@ import Tile from './Tile';
 import { useEffect } from 'react';
 import { Perf } from 'r3f-perf';
 import { OrbitControls } from '@react-three/drei';
+import { useControls } from 'leva';
 
 const Garden = ({ ...props }) => {
   const ref = useRef();
@@ -13,6 +14,10 @@ const Garden = ({ ...props }) => {
   }, []);
 
   const { tiles, gridSize, debug } = useStore();
+
+  const { sunColor } = useControls('Lighting', {
+    sunColor: 'white',
+  });
 
   // position each tile in the grid
   const garden = useMemo(() => {
@@ -40,6 +45,9 @@ const Garden = ({ ...props }) => {
           />
         ))}
       </group>
+
+      <pointLight intensity={0.15} position={[10, 10, 10]} color={sunColor} />
+      <ambientLight intensity={0.25} />
 
       <OrbitControls />
       {debug && <Perf position='bottom-left' />}

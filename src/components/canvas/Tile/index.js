@@ -1,14 +1,27 @@
 import useStore from '@/store';
-import { Box, shaderMaterial } from '@react-three/drei';
+import { Box, shaderMaterial, useTexture } from '@react-three/drei';
 import { extend, useFrame } from '@react-three/fiber';
 import { useControls } from 'leva';
 import React, { useCallback, useMemo, useRef } from 'react';
-import { Color } from 'three';
+import { Color, Texture } from 'three';
 import { damp } from 'three/src/math/MathUtils';
 import { vertexShader, fragmentShader } from './shaders';
+import normalImage from './img/sandNormal.png';
+import displacementImage from './img/sandDisplacement.png';
+import Stone from './Stone';
+import Pond from './Pond';
+import Tree from './Tree';
 
 const SandMaterial = shaderMaterial(
-  { uColor: new Color() },
+  {
+    uColor: new Color(),
+    uSunColor: new Color(),
+    uNormalMap: new Texture(),
+    uDisplacementMap: new Texture(),
+    uAmbientFactor: 0.5,
+    uDiffuseFactor: 0.5,
+    uDisplacement: 0.1,
+  },
   vertexShader,
   fragmentShader,
   (mat) => {
@@ -24,25 +37,21 @@ const Tile = ({ type = 'sand', index, level = 0, tendable, ...props }) => {
 
   const { clickedTile, showContextMenu } = useStore();
 
-  const { sandColor, stoneColor, pondColor, treeColor } = useControls({
+  const [normalTexture, displacementTexture] = useTexture([
+    normalImage.src,
+    displacementImage.src,
+  ]);
+
+  const { sandColor, displacement } = useControls('Sand', {
     sandColor: '#ffe3af',
-    stoneColor: '#b1b1b1',
-    pondColor: '#00bfff',
-    treeColor: '#4fcb72',
+    displacement: { value: 0.1, min: 0, max: 1, step: 0.05 },
   });
 
-  const tileColor = useMemo(() => {
-    switch (type) {
-      case 'sand':
-        return sandColor;
-      case 'stone':
-        return stoneColor;
-      case 'tree':
-        return treeColor;
-      case 'pond':
-        return pondColor;
-    }
-  }, [type, sandColor, stoneColor, pondColor, treeColor]);
+  const { sunColor, ambientFactor, diffuseFactor } = useControls('Lighting', {
+    sunColor: 'white',
+    ambientFactor: { value: 0.5, min: 0, max: 1, step: 0.05 },
+    diffuseFactor: { value: 0.5, min: 0, max: 1, step: 0.05 },
+  });
 
   const handleClick = useCallback(
     (e, tile) => {
@@ -61,16 +70,16 @@ const Tile = ({ type = 'sand', index, level = 0, tendable, ...props }) => {
   );
 
   useFrame(({ clock }, delta) => {
-    if (tendable) {
-      ref.current.position.y = damp(
-        ref.current.position.y,
-        Math.sin(clock.elapsedTime + 50 * index) * 0.1,
-        0.8,
-        delta
-      );
-    } else {
-      ref.current.position.y = damp(ref.current.position.y, 0, 1.5, delta);
-    }
+    // if (tendable) {
+    //   ref.current.position.y = damp(
+    //     ref.current.position.y,
+    //     Math.sin(clock.elapsedTime + 50 * index) * 0.1,
+    //     0.8,
+    //     delta
+    //   );
+    // } else {
+    //   ref.current.position.y = damp(ref.current.position.y, 0, 1.5, delta);
+    // }
   });
 
   return (
@@ -86,17 +95,32 @@ const Tile = ({ type = 'sand', index, level = 0, tendable, ...props }) => {
         tendable: tendable,
       }}
     >
-      <planeGeometry args={[1, 1]} />
-      {/* <meshBasicMaterial color={tileColor} /> */}
-      <sandMaterial uColor={tileColor} />
+      <planeGeometry args={[1, 1, 8, 8]} />
+      <sandMaterial
+        uColor={sandColor}
+        uNormalMap={normalTexture}
+        uDisplacementMap={displacementTexture}
+        uAmbientFactor={ambientFactor}
+        uDiffuseFactor={diffuseFactor}
+        uSunColor={sunColor}
+        uDisplacement={displacement}
+      />
+
+      {type === 'stone' && (
+        <Stone scale={[0.9, 0.9, 0.1]} position={[0, 0, 0.05]} />
+      )}
+      {type === 'pond' && (
+        <Pond scale={[0.9, 0.9, 0.1]} position={[0, 0, 0.05]} />
+      )}
+      {type === 'tree' && (
+        <Tree scale={[0.9, 0.9, 0.1]} position={[0, 0, 0.05]} />
+      )}
 
       {/* TEMPORARY FOR DEBUGGING LEVELS */}
       <group rotation-x={Math.PI / 2}>
-        {level > 0 && (
-          <Box scale={[0.1, 0.1, 0.1]} position={[-0.2, 0.05, 0]} />
-        )}
-        {level > 1 && <Box scale={[0.1, 0.1, 0.1]} position={[0.2, 0.05, 0]} />}
-        {level > 2 && <Box scale={[0.1, 0.1, 0.1]} position={[0, 0.05, 0.2]} />}
+        {level > 0 && <Box scale={[0.1, 0.1, 0.1]} position={[-0.2, 0.2, 0]} />}
+        {level > 1 && <Box scale={[0.1, 0.1, 0.1]} position={[0.2, 0.2, 0]} />}
+        {level > 2 && <Box scale={[0.1, 0.1, 0.1]} position={[0, 0.2, 0.2]} />}
       </group>
     </mesh>
   );

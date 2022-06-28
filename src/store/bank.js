@@ -1,5 +1,5 @@
 const bankSlice = (set, get) => ({
-  balance: 200,
+  balance: 20,
 
   baseCosts: {
     stone: 10,
