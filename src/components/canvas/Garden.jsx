@@ -15,8 +15,9 @@ const Garden = ({ ...props }) => {
 
   const { tiles, gridSize, debug } = useStore();
 
-  const { sunColor } = useControls('Lighting', {
+  const { sunColor, sunPos } = useControls('Lighting', {
     sunColor: 'white',
+    sunPos: [0, 10, -2],
   });
 
   // position each tile in the grid
@@ -46,7 +47,12 @@ const Garden = ({ ...props }) => {
         ))}
       </group>
 
-      <pointLight intensity={0.15} position={[10, 10, 10]} color={sunColor} />
+      <pointLight intensity={0.15} position={sunPos} color={sunColor}>
+        <mesh>
+          <boxBufferGeometry args={[0.1, 0.1, 0.1]} />
+          <meshBasicMaterial color='red' />
+        </mesh>
+      </pointLight>
       <ambientLight intensity={0.25} />
 
       <OrbitControls />

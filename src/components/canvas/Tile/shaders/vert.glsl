@@ -19,5 +19,8 @@ void main() {
 
   gl_Position = projectionMatrix * viewMatrix * modelPos;
   vPos = modelPos.xyz;
+  vPos.xz += (WORLD_SIZE * 0.5);
+  vPos.xz /= WORLD_SIZE;
+
   vSt = st;
 }

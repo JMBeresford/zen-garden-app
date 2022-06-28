@@ -26,8 +26,12 @@ void main() {
   float diffuse = max(dot(lightDir, normal), 0.0);
   float specularFactor = 1.0 - texture2D(uRoughnessMap, vSt).r;
 
+  // hacky way to make the specular highlight more visible
+  vec3 cam = cameraPosition;
+  cam.z *= -1.0;
+
   vec3 R = reflect(lightDir, normal);
-  vec3 V = normalize(cameraPosition - vPos);
+  vec3 V = normalize(cam - vPos);
   float specular = pow(max(dot(R, V), 0.0), 5.0);
   
   vec3 color = uColor * uAmbientFactor;
