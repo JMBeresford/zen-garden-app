@@ -5,9 +5,7 @@ import { useControls } from 'leva';
 import React, { useCallback, useMemo, useRef } from 'react';
 import { Color, Texture } from 'three';
 import { vertexShader, fragmentShader } from './shaders';
-import normalImage from '@/img/sandNormal.png';
-import displacementImage from '@/img/sandDisplacement.png';
-import roughnessImage from '@/img/sandRoughness.png';
+import noiseImage from '@/img/waves.png';
 import Stone from './Stone';
 import Pond from './Pond';
 import Tree from './Tree';
@@ -17,12 +15,10 @@ const SandMaterial = shaderMaterial(
     uColor: new Color(),
     uSunColor: new Color(),
     uSunPos: [0, 0, 0],
-    uNormalMap: new Texture(),
-    uDisplacementMap: new Texture(),
-    uRoughnessMap: new Texture(),
+    uNoiseMap: new Texture(),
+    uTime: 0,
     uAmbientFactor: 0.5,
     uDiffuseFactor: 0.5,
-    uDisplacement: 0.1,
   },
   vertexShader,
   fragmentShader,
@@ -40,15 +36,10 @@ const Tile = ({ type = 'sand', index, level = 0, tendable, ...props }) => {
   const { clickedTile, showContextMenu } = useStore();
   const tendTile = useStore((state) => state.actions.tendTile);
 
-  const [normalTexture, displacementTexture, roughnessTexture] = useTexture([
-    normalImage.src,
-    displacementImage.src,
-    roughnessImage.src,
-  ]);
+  const noiseTexture = useTexture(noiseImage.src);
 
-  const { sandColor, displacement } = useControls('Sand', {
-    sandColor: '#ffe3af',
-    displacement: { value: 0.1, min: 0, max: 1, step: 0.05 },
+  const { sandColor } = useControls('Sand', {
+    sandColor: '#ffeac2',
   });
 
   const { sunColor, sunPos, ambientFactor, diffuseFactor } = useControls(
@@ -56,8 +47,8 @@ const Tile = ({ type = 'sand', index, level = 0, tendable, ...props }) => {
     {
       sunColor: 'white',
       sunPos: [0, 10, -2],
-      ambientFactor: { value: 0.5, min: 0, max: 1, step: 0.05 },
-      diffuseFactor: { value: 0.5, min: 0, max: 1, step: 0.05 },
+      ambientFactor: { value: 0.9, min: 0, max: 1, step: 0.05 },
+      diffuseFactor: { value: 0.2, min: 0, max: 1, step: 0.05 },
     }
   );
 
@@ -82,6 +73,8 @@ const Tile = ({ type = 'sand', index, level = 0, tendable, ...props }) => {
       // DO SOME ANIMATION
       tendTile(ref.current);
     }
+
+    ref.current.material.uTime = clock.elapsedTime;
   });
 
   return (
@@ -100,13 +93,10 @@ const Tile = ({ type = 'sand', index, level = 0, tendable, ...props }) => {
       <planeGeometry args={[1, 1, 8, 8]} />
       <sandMaterial
         uColor={sandColor}
-        uNormalMap={normalTexture}
-        uDisplacementMap={displacementTexture}
-        uRoughnessMap={roughnessTexture}
+        uNoiseMap={noiseTexture}
         uAmbientFactor={ambientFactor}
         uDiffuseFactor={diffuseFactor}
         uSunColor={sunColor}
-        uDisplacement={displacement}
         uSunPos={sunPos}
       />
 

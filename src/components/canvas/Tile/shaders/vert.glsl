@@ -1,8 +1,5 @@
 #define WORLD_SIZE 30.0
 
-uniform float uDisplacement;
-uniform sampler2D uDisplacementMap;
-
 varying vec2 vSt;
 varying vec3 vPos;
 
@@ -12,10 +9,6 @@ void main() {
   vec2 st = modelPos.xz;
   st += (WORLD_SIZE * 0.5);
   st /= WORLD_SIZE;
-
-  float displacement = texture2D(uDisplacementMap, st).r;
-
-  modelPos.y += displacement * uDisplacement;
 
   gl_Position = projectionMatrix * viewMatrix * modelPos;
   vPos = modelPos.xyz;

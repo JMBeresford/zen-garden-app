@@ -27,7 +27,7 @@ export default function Model({ ...props }) {
         <meshPhongMaterial map={bakedTexture} aoMap={aoTexture} />
       </mesh>
       <mesh geometry={nodes.logBinds.geometry}>
-        <meshPhongMaterial color={'lightgrey'} />
+        <meshPhongMaterial color={'#BCB8C1'} />
       </mesh>
     </group>
   );
