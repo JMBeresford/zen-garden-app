@@ -63,7 +63,6 @@ const Garden = ({ ...props }) => {
   return (
     <>
       <group ref={ref} {...props}>
-        <Instances ma></Instances>
         {garden.map((tile, index) => (
           <Tile
             key={index}
