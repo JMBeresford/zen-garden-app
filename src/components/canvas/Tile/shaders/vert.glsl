@@ -1,4 +1,4 @@
-#define WORLD_SIZE 20.0
+#define WORLD_SIZE 30.0
 
 uniform float uDisplacement;
 uniform sampler2D uDisplacementMap;
